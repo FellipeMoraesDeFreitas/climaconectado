@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clima Conectado</title>
+  <style>
+:root {
+  --green-900: #163829;
+  --green-800: #1b4d3e;
+  --green-700: #235a48;
+  --cream: #f5f2e7;
+  --card: #ffffff;
+  --card-border: #e7e2d3;
+  --ink: #1c1c1a;
+  --ink-soft: #5a5a54;
+  --orange: #e8a33d;
+  --orange-dark: #d4922e;
+  --radius: 16px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  padding-bottom: 76px;
+}
+
+/* Topbar */
+.topbar {
+  background: var(--green-800);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+}
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.topbar-menu {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* Main */
+#app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 20px 20px 8px;
+}
+
+/* Hero */
+.hero {
+  background: var(--green-800);
+  color: #fff;
+  border-radius: 20px;
+  padding: 28px 24px;
+  margin-bottom: 20px;
+}
+.hero h1 {
+  font-size: 1.7rem;
+  line-height: 1.25;
+  margin: 0 0 12px;
+}
+.hero p {
+  color: #d9e6df;
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+.btn-primary {
+  background: var(--orange);
+  color: #26200f;
+  border: none;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 14px 22px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.btn-primary:hover { background: var(--orange-dark); }
+
+/* Feature cards */
+.card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+.card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #eaf1ec;
+  color: var(--green-800);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.card-body { flex: 1; }
+.card-body h3 { margin: 0 0 2px; font-size: 1.05rem; }
+.card-body p { margin: 0; color: var(--ink-soft); font-size: 0.92rem; }
+.card-arrow { color: var(--ink-soft); font-size: 1.2rem; }
+
+/* Bottom nav */
+.bottomnav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #fff;
+  border-top: 1px solid var(--card-border);
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+}
+.nav-item {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+.nav-item svg { width: 22px; height: 22px; }
+.nav-item.active { color: var(--green-800); font-weight: 700; }
+
+/* Section headings */
+.section-title {
+  font-size: 1.3rem;
+  margin: 4px 0 16px;
+}
+.back-link {
+  background: none;
+  border: none;
+  color: var(--green-800);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 0 14px;
+  font-size: 0.95rem;
+}
+
+/* Quiz */
+.quiz-progress {
+  height: 6px;
+  background: var(--card-border);
+  border-radius: 4px;
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+.quiz-progress-fill {
+  height: 100%;
+  background: var(--green-800);
+  transition: width .25s ease;
+}
+.quiz-question {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.quiz-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  font-size: 0.96rem;
+}
+.quiz-option.correct { border-color: var(--green-800); background: #eaf3ee; }
+.quiz-option.wrong { border-color: #c0503f; background: #fbeae7; }
+.quiz-option[disabled] { cursor: default; }
+
+.quiz-result {
+  text-align: center;
+  padding: 20px 0;
+}
+.quiz-result .score {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--green-800);
+}
+
+/* Calculator */
+.field { margin-bottom: 18px; }
+.field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 0.94rem;
+}
+.field input[type="number"], .field select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  font-size: 0.96rem;
+  background: #fff;
+}
+.calc-result {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-top: 20px;
+  text-align: center;
+}
+.calc-result .kg {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--green-800);
+}
+.calc-result .level {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.level-baixo { background: #eaf3ee; color: var(--green-800); }
+.level-medio { background: #fdf1de; color: var(--orange-dark); }
+.level-alto { background: #fbeae7; color: #c0503f; }
+
+/* Tips */
+.tip {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 12px;
+}
+.tip h4 { margin: 0 0 4px; font-size: 1rem; }
+.tip p { margin: 0; color: var(--ink-soft); font-size: 0.92rem; }
+
+.loading, .error {
+  text-align: center;
+  color: var(--ink-soft);
+  padding: 30px 0;
+}
+
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-brand">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2C8 6 5 9.5 5 13.5C5 17.6 8.1 21 12 21C15.9 21 19 17.6 19 13.5C19 9.5 16 6 12 2Z"/>
+      </svg>
+      <span>Clima Conectado</span>
+    </div>
+    <button class="topbar-menu" id="menuBtn" aria-label="Abrir menu">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+  </header>
+
+  <main id="app"></main>
+
+  <nav class="bottomnav">
+    <button class="nav-item active" data-view="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11L12 3l9 8"/><path d="M5 10v10h14V10"/></svg>
+      <span>Início</span>
+    </button>
+    <button class="nav-item" data-view="quiz">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.9.4-1 1-1 1.7"/><line x1="12" y1="17" x2="12" y2="17.1"/></svg>
+      <span>Quiz</span>
+    </button>
+    <button class="nav-item" data-view="calc">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="12" x2="8" y2="12"/><line x1="12" y1="12" x2="12" y2="12"/><line x1="16" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="12" y1="16" x2="12" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg>
+      <span>Calc.</span>
+    </button>
+    <button class="nav-item" data-view="dicas">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.6.5 1 1.3 1 2.1V16h6v-.4c0-.8.4-1.6 1-2.1A6 6 0 0 0 12 3Z"/></svg>
+      <span>Dicas</span>
+    </button>
+  </nav>
+
+  <script>
+// Clima Conectado — front-end
+// Consome a API Flask (back-end) em /api/*. Se o back-end não estiver no ar,
+// usa dados locais de fallback para o app continuar demonstrável.
+
+const API_BASE = window.CLIMA_API_BASE || "http://localhost:5000/api";
+
+const app = document.getElementById("app");
+const navItems = document.querySelectorAll(".nav-item");
+
+const FALLBACK_QUIZ = [
+  { pergunta: "Qual é o principal gás de efeito estufa emitido por atividades humanas?", opcoes: ["Oxigênio", "Dióxido de carbono (CO₂)", "Nitrogênio", "Hidrogênio"], correta: 1 },
+  { pergunta: "O Acordo de Paris estabeleceu como meta limitar o aquecimento global a quanto, preferencialmente?", opcoes: ["1,5°C", "5°C", "10°C", "0,1°C"], correta: 0 },
+  { pergunta: "Qual setor é uma das maiores fontes de emissão de CO₂ no mundo?", opcoes: ["Educação", "Geração de energia", "Artes", "Esportes"], correta: 1 },
+  { pergunta: "O desmatamento contribui para o aquecimento global porque:", opcoes: ["Reduz a capacidade de absorção de CO₂", "Aumenta a umidade do ar", "Resfria o solo", "Não tem relação com o clima"], correta: 0 },
+  { pergunta: "O que é a \"pegada de carbono\"?", opcoes: ["Um tipo de pegada de animal", "A quantidade de gases de efeito estufa emitidos por uma pessoa ou atividade", "Uma marca de calçado sustentável", "Um índice de poluição do ar apenas"], correta: 1 },
+  { pergunta: "Qual dessas ações reduz emissões de CO₂?", opcoes: ["Usar mais transporte individual motorizado", "Priorizar transporte público e bicicleta", "Aumentar o consumo de carne vermelha", "Desperdiçar energia elétrica"], correta: 1 },
+  { pergunta: "O aumento do nível do mar é causado principalmente por:", opcoes: ["Derretimento de gelo e expansão térmica da água", "Aumento da chuva", "Erosão costeira apenas", "Marés mais fortes"], correta: 0 },
+  { pergunta: "Energias renováveis incluem:", opcoes: ["Carvão e petróleo", "Solar e eólica", "Gás natural", "Diesel"], correta: 1 },
+  { pergunta: "O ODS 13 da ONU trata de:", opcoes: ["Erradicação da pobreza", "Ação contra a mudança global do clima", "Igualdade de gênero", "Educação de qualidade"], correta: 1 },
+  { pergunta: "Reduzir o desperdício de alimentos ajuda o clima porque:", opcoes: ["Não tem nenhum efeito", "Diminui emissões ligadas à produção e ao descarte de comida", "Aumenta o consumo de energia", "Aumenta o desmatamento"], correta: 1 }
+];
+
+const FALLBACK_DICAS = [
+  { titulo: "Priorize o transporte ativo", texto: "Ir a pé, de bicicleta ou de transporte público reduz bastante suas emissões de CO₂ em relação ao carro." },
+  { titulo: "Economize energia elétrica", texto: "Desligue aparelhos em stand-by e prefira lâmpadas de LED — pequenos hábitos reduzem seu consumo mensal." },
+  { titulo: "Reduza o desperdício de alimentos", texto: "Planeje as compras e reaproveite as sobras. Alimento desperdiçado também representa emissões desperdiçadas." },
+  { titulo: "Diminua o consumo de carne vermelha", texto: "A pecuária é uma das maiores fontes de metano. Reduzir o consumo, mesmo que gradualmente, já ajuda." },
+  { titulo: "Separe o lixo para reciclagem", texto: "Reciclar economiza energia e matéria-prima em relação à produção de itens novos." }
+];
+
+function setActiveNav(view) {
+  navItems.forEach(btn => btn.classList.toggle("active", btn.dataset.view === view));
+}
+
+async function apiGet(path, fallback) {
+  try {
+    const res = await fetch(`${API_BASE}${path}`);
+    if (!res.ok) throw new Error("resposta não ok");
+    return await res.json();
+  } catch (e) {
+    console.warn(`API indisponível (${path}), usando dados locais de fallback.`, e);
+    return fallback;
+  }
+}
+
+async function apiPost(path, body, fallbackFn) {
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error("resposta não ok");
+    return await res.json();
+  } catch (e) {
+    console.warn(`API indisponível (${path}), calculando localmente.`, e);
+    return fallbackFn(body);
+  }
+}
+
+// ---------- VIEWS ----------
+
+function renderHome() {
+  app.innerHTML = `
+    <section class="hero">
+      <h1>Entenda as mudanças climáticas. Aja agora.</h1>
+      <p>Teste seus conhecimentos e calcule sua pegada de carbono.</p>
+      <button class="btn-primary" id="goQuizHero">Iniciar Quiz</button>
+    </section>
+
+    <button class="card" data-go="quiz">
+      <span class="card-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.9.4-1 1-1 1.7"/><line x1="12" y1="17" x2="12" y2="17.1"/></svg>
+      </span>
+      <span class="card-body">
+        <h3>Quiz Interativo</h3>
+        <p>10 perguntas sobre o clima</p>
+      </span>
+      <span class="card-arrow">&#8594;</span>
+    </button>
+
+    <button class="card" data-go="calc">
+      <span class="card-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/></svg>
+      </span>
+      <span class="card-body">
+        <h3>Calculadora de Pegada</h3>
+        <p>Estime suas emissões de CO₂</p>
+      </span>
+      <span class="card-arrow">&#8594;</span>
+    </button>
+
+    <button class="card" data-go="dicas">
+      <span class="card-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0-4 10.5c.6.5 1 1.3 1 2.1V16h6v-.4c0-.8.4-1.6 1-2.1A6 6 0 0 0 12 3Z"/></svg>
+      </span>
+      <span class="card-body">
+        <h3>Dicas de Mitigação</h3>
+        <p>Atitudes práticas do dia a dia</p>
+      </span>
+      <span class="card-arrow">&#8594;</span>
+    </button>
+  `;
+  document.getElementById("goQuizHero").onclick = () => navigate("quiz");
+  app.querySelectorAll("[data-go]").forEach(el => {
+    el.onclick = () => navigate(el.dataset.go);
+  });
+}
+
+async function renderQuiz() {
+  app.innerHTML = `<p class="loading">Carregando perguntas…</p>`;
+  const data = await apiGet("/quiz", FALLBACK_QUIZ);
+
+  let index = 0;
+  let score = 0;
+
+  function renderQuestion() {
+    const q = data[index];
+    app.innerHTML = `
+      <button class="back-link" id="backHome">&#8592; Início</button>
+      <div class="quiz-progress"><div class="quiz-progress-fill" style="width:${(index / data.length) * 100}%"></div></div>
+      <p class="quiz-question">${index + 1}. ${q.pergunta}</p>
+      <div id="options"></div>
+    `;
+    document.getElementById("backHome").onclick = () => navigate("home");
+
+    const optionsEl = document.getElementById("options");
+    q.opcoes.forEach((opcao, i) => {
+      const btn = document.createElement("button");
+      btn.className = "quiz-option";
+      btn.textContent = opcao;
+      btn.onclick = () => {
+        const allBtns = optionsEl.querySelectorAll(".quiz-option");
+        allBtns.forEach(b => (b.disabled = true));
+        if (i === q.correta) {
+          btn.classList.add("correct");
+          score++;
+        } else {
+          btn.classList.add("wrong");
+          allBtns[q.correta].classList.add("correct");
+        }
+        setTimeout(() => {
+          index++;
+          if (index < data.length) renderQuestion();
+          else renderResult();
+        }, 700);
+      };
+      optionsEl.appendChild(btn);
+    });
+  }
+
+  function renderResult() {
+    app.innerHTML = `
+      <div class="quiz-result">
+        <p>Você acertou</p>
+        <p class="score">${score} / ${data.length}</p>
+        <p>${score >= data.length * 0.7 ? "Ótimo! Você entende bem o tema." : "Vale a pena revisar as Dicas de Mitigação."}</p>
+        <br/>
+        <button class="btn-primary" id="retry">Refazer Quiz</button>
+      </div>
+    `;
+    document.getElementById("retry").onclick = () => { index = 0; score = 0; renderQuestion(); };
+  }
+
+  renderQuestion();
+}
+
+function localCalc({ km_carro_semana, kwh_mes, refeicoes_carne_semana }) {
+  // Fatores aproximados (kg CO2), só usados se o back-end estiver fora do ar.
+  const co2Transporte = km_carro_semana * 0.192 * 4.345; // kg/mês
+  const co2Energia = kwh_mes * 0.0817; // kg/mês (fator médio SIN Brasil)
+  const co2Carne = refeicoes_carne_semana * 3.3 * 4.345; // kg/mês
+  const total = co2Transporte + co2Energia + co2Carne;
+  let nivel = "baixo";
+  if (total > 400) nivel = "alto";
+  else if (total > 200) nivel = "medio";
+  return { total_kg_mes: Math.round(total), nivel };
+}
+
+function renderCalc() {
+  app.innerHTML = `
+    <button class="back-link" id="backHome">&#8592; Início</button>
+    <h2 class="section-title">Calculadora de Pegada</h2>
+    <form id="calcForm">
+      <div class="field">
+        <label for="km">Km rodados de carro por semana</label>
+        <input type="number" id="km" min="0" value="0" required />
+      </div>
+      <div class="field">
+        <label for="kwh">Consumo de energia elétrica (kWh/mês)</label>
+        <input type="number" id="kwh" min="0" value="150" required />
+      </div>
+      <div class="field">
+        <label for="carne">Refeições com carne vermelha por semana</label>
+        <input type="number" id="carne" min="0" value="3" required />
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%">Calcular</button>
+    </form>
+    <div id="result"></div>
+  `;
+  document.getElementById("backHome").onclick = () => navigate("home");
+
+  document.getElementById("calcForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const body = {
+      km_carro_semana: Number(document.getElementById("km").value),
+      kwh_mes: Number(document.getElementById("kwh").value),
+      refeicoes_carne_semana: Number(document.getElementById("carne").value)
+    };
+    const result = await apiPost("/calcular", body, localCalc);
+    const label = { baixo: "Pegada baixa", medio: "Pegada média", alto: "Pegada alta" }[result.nivel];
+    document.getElementById("result").innerHTML = `
+      <div class="calc-result">
+        <p>Emissão estimada</p>
+        <p class="kg">${result.total_kg_mes} kg CO₂/mês</p>
+        <span class="level level-${result.nivel}">${label}</span>
+      </div>
+    `;
+  };
+}
+
+async function renderDicas() {
+  app.innerHTML = `<p class="loading">Carregando dicas…</p>`;
+  const dicas = await apiGet("/dicas", FALLBACK_DICAS);
+  app.innerHTML = `
+    <button class="back-link" id="backHome">&#8592; Início</button>
+    <h2 class="section-title">Dicas de Mitigação</h2>
+    ${dicas.map(d => `<div class="tip"><h4>${d.titulo}</h4><p>${d.texto}</p></div>`).join("")}
+  `;
+  document.getElementById("backHome").onclick = () => navigate("home");
+}
+
+// ---------- ROUTER ----------
+
+function navigate(view) {
+  setActiveNav(view);
+  window.location.hash = view;
+  if (view === "home") renderHome();
+  else if (view === "quiz") renderQuiz();
+  else if (view === "calc") renderCalc();
+  else if (view === "dicas") renderDicas();
+}
+
+navItems.forEach(btn => btn.addEventListener("click", () => navigate(btn.dataset.view)));
+
+window.addEventListener("hashchange", () => {
+  const view = window.location.hash.replace("#", "") || "home";
+  navigate(view);
+});
+
+// inicialização
+navigate(window.location.hash.replace("#", "") || "home");
+
+</script>
+</body>
+</html>
